@@ -68,7 +68,15 @@ add = () => {
 }
 
 addDept = () => {
-
+    inquirer.prompt([
+        {
+            type: "input",
+            name: "addingDept",
+            message: "Please enter the name of your department."
+        },
+        ]).then(function(answer) {
+           
+    });
 }
 
 addRole = () => {

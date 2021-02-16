@@ -7,8 +7,8 @@ const connection = mysql.createConnection({
   // Your username
   user: "root",
   // Your password
-  password: "password",
-  database: "your_database_name"
+  password: "chicken20",
+  database: "employee_management_db"
 });
 
 connection.connect(function(err) {
@@ -65,4 +65,90 @@ add = () => {
                 manageCompany();
             }
     });
+}
+
+addDept = () => {
+
+}
+
+addRole = () => {
+
+}
+
+addEmployee = () => {
+
+}
+
+view = () => {
+    inquirer.prompt([
+        {
+            type: "list",
+            name: "chooseView",
+            message: "What would you like to view?",
+            choices: [
+                "View department",
+                "View role",
+                "View employee",
+                "Main Menu"
+            ]
+        }]).then(selection => {
+            if (selection.chooseAction === "View department") {
+                viewDept();
+            } else if (selection.chooseAction === "View role") {
+                viewRole();
+            } else if (selection.chooseAction === "View employee") {
+                viewEmployee();
+            } else {
+                manageCompany();
+            }
+    });
+}
+
+viewDept = () => {
+
+}
+
+viewRole = () => {
+
+}
+
+viewEmployee = () => {
+
+}
+
+update = () => {
+    inquirer.prompt([
+        {
+            type: "list",
+            name: "chooseUpdate",
+            message: "What would you like to update?",
+            choices: [
+                "Update department",
+                "Update role",
+                "Update employee",
+                "Main Menu"
+            ]
+        }]).then(selection => {
+            if (selection.chooseAction === "Update department") {
+                updateDept();
+            } else if (selection.chooseAction === "Update role") {
+                updateRole();
+            } else if (selection.chooseAction === "Update employee") {
+                updateEmployee();
+            } else {
+                manageCompany();
+            }
+    });
+}
+
+updateDept = () => {
+
+}
+
+updateRole = () => {
+
+}
+
+updateEmployee = () => {
+
 }

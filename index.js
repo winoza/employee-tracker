@@ -24,18 +24,21 @@ manageCompany = () => {
             name: "chooseAction",
             message: "What would you like to do?",
             choices: [
-                "Add department, role, or employee",
-                "View departments, roles, or employees",
-                "Update departments, roles, or employees",
+                "Add department, employee, or role",
+                "View departments, employees, or roles",
+                "Delete departments, employees, or roles",
+                "Update roles",
                 "Exit"
             ]
         }]).then(selection => {
-        if (selection.chooseAction === "Add department, role, or employee") {
+        if (selection.chooseAction === "Add department, employee, or role") {
             add();
-        } else if (selection.chooseAction === "View departments, roles, or employees") {
+        } else if (selection.chooseAction === "View departments, employees, or roles") {
             view();
-        } else if (selection.chooseAction === "Update departments, roles, or employees") {
-            update();
+        } else if (selection.chooseAction === "Delete departments, employees, or roles") {
+            deletes();
+        } else if (selection.chooseAction === "Update roles") {
+            updateRole();
         } else {
             quit();
         }
@@ -50,20 +53,20 @@ add = () => {
             message: "What would you like to add?",
             choices: [
                 "Add department",
-                "Add role",
                 "Add employee",
+                "Add role",
                 "Main Menu"
             ]
         }]).then(selection => {
-            if (selection.chooseAction === "Add department") {
+            if (selection.chooseAdd === "Add department") {
                 addDept();
-            } else if (selection.chooseAction === "Add role") {
-                addRole();
-            } else if (selection.chooseAction === "Add employee") {
+            } else if (selection.chooseAdd === "Add employee") {
                 addEmployee();
+            } else if (selection.chooseAdd === "Add role") {
+                addRole();
             } else {
                 manageCompany();
-            }
+        }
     });
 }
 
@@ -71,20 +74,99 @@ addDept = () => {
     inquirer.prompt([
         {
             type: "input",
-            name: "addingDept",
+            name: "addDept",
             message: "Please enter the name of your department."
         },
-        ]).then(function(answer) {
-           
+        ]).then(answers => {
+            connection.query(
+                "INSERT INTO department SET ?",
+                { 
+                    department_name: answers.addDept
+                }, 
+            (err) => {
+                if (err) throw err
+                console.log("-----Department added successfully!-----");
+                manageCompany();
+        })
+    });
+}
+
+addEmployee = () => {
+    inquirer.prompt([
+        {
+            type: "input",
+            name: "employeeId",
+            message: "Please enter employee's id."
+        },
+        {
+            type: "input",
+            name: "firstName",
+            message: "Please enter employee's first name."
+        },
+        {
+            type: "input",
+            name: "lastName",
+            message: "Please enter employee's last name."
+        },
+        {
+            type: "input",
+            name: "addEmployeeRole",
+            message: "Please enter employee's role id."
+        },
+        {
+            type: "input",
+            name: "addEmployeeManager",
+            message: "Please enter employee's manager id. (If no manager, click 'Enter')"
+        },
+        ]).then(answers => {
+            connection.query(
+                "INSERT INTO employee SET ?",
+                { 
+                    id: answers.employeeId,
+                    first_name: answers.firstName,
+                    last_name: answers.lastName,
+                    role_id: answers.addEmployeeRole,
+                    manager_id: answers.addEmployeeManager 
+                }, 
+            (err) => {
+                if (err) throw err
+                console.log("-----Employee added successfully!-----");
+                manageCompany();
+        })
     });
 }
 
 addRole = () => {
-
-}
-
-addEmployee = () => {
-
+    inquirer.prompt([
+        {
+            type: "input",
+            name: "addingRole",
+            message: "What role would you like to add?"
+        },
+        {
+            type: "input",
+            name: "roleSalary",
+            message: "Please enter role's salary."
+        },
+        {
+            type: "input",
+            name: "addDeptId",
+            message: "Please enter department id no."
+        },
+        ]).then(answers => {
+            connection.query(
+                "INSERT INTO employee_role SET ?",
+                { 
+                    title: answers.addingRole,
+                    salary: answers.roleSalary,
+                    department_id: answers.addDeptId, 
+                }, 
+            (err) => {
+                if (err) throw err
+                console.log("-----Role added successfully!-----");
+                manageCompany();
+        })
+    });
 }
 
 view = () => {
@@ -94,18 +176,18 @@ view = () => {
             name: "chooseView",
             message: "What would you like to view?",
             choices: [
-                "View department",
-                "View role",
-                "View employee",
+                "View departments",
+                "View employees",
+                "View roles",
                 "Main Menu"
             ]
         }]).then(selection => {
-            if (selection.chooseAction === "View department") {
+            if (selection.chooseView === "View departments") {
                 viewDept();
-            } else if (selection.chooseAction === "View role") {
-                viewRole();
-            } else if (selection.chooseAction === "View employee") {
+            } else if (selection.chooseView === "View employees") {
                 viewEmployee();
+            } else if (selection.chooseView === "View roles") {
+                viewRole();
             } else {
                 manageCompany();
             }
@@ -113,50 +195,216 @@ view = () => {
 }
 
 viewDept = () => {
-
-}
-
-viewRole = () => {
-
+    connection.query("SELECT * FROM department", (err, res) => {
+        if (err) throw err
+        console.table(res);
+        manageCompany();
+    })
 }
 
 viewEmployee = () => {
-
+    connection.query("SELECT * FROM employee", (err, res) => {
+        if (err) throw err
+        console.table(res);
+        manageCompany();
+    })
 }
 
-update = () => {
+viewRole = () => {
+    connection.query("SELECT * FROM employee_role", (err, res) => {
+        if (err) throw err
+        console.table(res);
+        manageCompany();
+    })
+}
+
+
+updateRole = () => {
+    connection.query("SELECT * FROM employee", function(err, res) {
+        if (err) throw err;
+        inquirer.prompt([
+            {
+                name: "chooseEmployeeUpdate",
+                type: "list",
+                choices: function() {
+                    var employees = [];
+                    for (var i = 0; i < res.length; i++) {
+                        employees.push(`${res[i].id} ${res[i].first_name} ${res[i].last_name}`)
+                    };
+                    return employees;
+                },
+                message: "Please select the employee you would like update.",
+            },
+            {
+                name: "updateRoleId",
+                type: "input",
+                message: "Please select employee's new role (id).",
+            },
+            ]).then(answers => {
+                var chosenEmployee;
+                for (var i = 0; i < res.length; i++) {
+                if (`${res[i].id} ${res[i].first_name} ${res[i].last_name}` === answers.chooseEmployeeUpdate) {
+                    chosenEmployee = res[i];
+                    }
+                }
+                connection.query(
+                    "UPDATE employee SET ? WHERE ?",
+                    [
+                        {
+                            role_id: answers.updateRoleId
+                        },
+                        {
+                            id: chosenEmployee.id
+                        }
+                    ],
+                (err) => {
+                    if (err) throw err
+                    console.log("-----Employee role updated successfully!-----");
+                    manageCompany();
+            })
+        });
+    })
+}
+
+deletes = () => {
     inquirer.prompt([
         {
             type: "list",
-            name: "chooseUpdate",
-            message: "What would you like to update?",
+            name: "chooseAdd",
+            message: "What would you like to add?",
             choices: [
-                "Update department",
-                "Update role",
-                "Update employee",
+                "Delete department",
+                "Delete employee",
+                "Delete role",
                 "Main Menu"
             ]
         }]).then(selection => {
-            if (selection.chooseAction === "Update department") {
-                updateDept();
-            } else if (selection.chooseAction === "Update role") {
-                updateRole();
-            } else if (selection.chooseAction === "Update employee") {
-                updateEmployee();
+            if (selection.chooseAdd === "Delete department") {
+                deleteDept();
+            } else if (selection.chooseAdd === "Delete employee") {
+                deleteEmployee();
+            } else if (selection.chooseAdd === "Delete role") {
+                deleteRole();
             } else {
                 manageCompany();
-            }
+        }
     });
 }
 
-updateDept = () => {
-
+deleteDept = () => {
+    connection.query("SELECT * FROM department", function(err, res) {
+        if (err) throw err;
+        inquirer.prompt([
+            {
+                name: "deletingDept",
+                type: "list",
+                choices: function() {
+                    var departments = [];
+                    for (var i = 0; i < res.length; i++) {
+                        departments.push(`${res[i].id} ${res[i].department_name}`)
+                    };
+                    return departments;
+                },
+                message: "Please select the department you would like to delete.",
+            },
+            ]).then(answers => {
+                var chosenDept;
+                for (var i = 0; i < res.length; i++) {
+                if (`${res[i].id} ${res[i].department_name}` === answers.deletingDept) {
+                    chosenDept = res[i];
+                    }
+                }
+                connection.query(
+                    "DELETE FROM department WHERE ?",
+                    [
+                        {
+                            id: chosenDept.id
+                        },
+                    ],
+                (err) => {
+                    if (err) throw err
+                    console.log("-----Department deleted successfully!-----");
+                    manageCompany();
+            })
+        });
+    })
 }
 
-updateRole = () => {
-
+/*deleteEmployee = () => {
+    connection.query("SELECT * FROM employee", function(err, res) {
+        if (err) throw err;
+        inquirer.prompt([
+            {
+                name: "deletingDept",
+                type: "list",
+                choices: function() {
+                    var departments = [];
+                    for (var i = 0; i < res.length; i++) {
+                        departments.push(`${res[i].name}`)
+                    };
+                    return departments;
+                },
+                message: "Please select the department you would like to delete.",
+            },
+            ]).then(answers => {
+                var chosenDept;
+                for (var i = 0; i < res.length; i++) {
+                if (`${res[i].id} ${res[i].first_name} ${res[i].last_name}` === answers.chooseEmployeeUpdate) {
+                    chosenDept = res[i];
+                    }
+                }
+                connection.query(
+                    "DELETE FROM department WHERE ?",
+                    [
+                        {
+                            id: chosenDept.id
+                        },
+                    ],
+                (err) => {
+                    if (err) throw err
+                    console.log("-----Department deleted successfully!-----");
+                    //manageCompany();
+            })
+        });
+    })
 }
 
-updateEmployee = () => {
-
+deleteRole = () => {
+    connection.query("SELECT * FROM employee", function(err, res) {
+        if (err) throw err;
+        inquirer.prompt([
+            {
+                name: "deletingDept",
+                type: "list",
+                choices: function() {
+                    var departments = [];
+                    for (var i = 0; i < res.length; i++) {
+                        departments.push(`${res[i].name}`)
+                    };
+                    return departments;
+                },
+                message: "Please select the department you would like to delete.",
+            },
+            ]).then(answers => {
+                var chosenDept;
+                for (var i = 0; i < res.length; i++) {
+                if (`${res[i].id} ${res[i].first_name} ${res[i].last_name}` === answers.chooseEmployeeUpdate) {
+                    chosenDept = res[i];
+                    }
+                }
+                connection.query(
+                    "DELETE FROM department WHERE ?",
+                    [
+                        {
+                            id: chosenDept.id
+                        },
+                    ],
+                (err) => {
+                    if (err) throw err
+                    console.log("-----Department deleted successfully!-----");
+                    //manageCompany();
+            })
+        });
+    })
 }
+*/

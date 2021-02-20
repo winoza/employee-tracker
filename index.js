@@ -330,46 +330,46 @@ deleteDept = () => {
     })
 }
 
-/*deleteEmployee = () => {
+deleteEmployee = () => {
     connection.query("SELECT * FROM employee", function(err, res) {
         if (err) throw err;
         inquirer.prompt([
             {
-                name: "deletingDept",
+                name: "deletingEmp",
                 type: "list",
                 choices: function() {
-                    var departments = [];
+                    var employees = [];
                     for (var i = 0; i < res.length; i++) {
-                        departments.push(`${res[i].name}`)
+                        employees.push(`${res[i].id} ${res[i].first_name} ${res[i].last_name}`)
                     };
-                    return departments;
+                    return employees;
                 },
                 message: "Please select the department you would like to delete.",
             },
             ]).then(answers => {
-                var chosenDept;
+                var chosenEmp;
                 for (var i = 0; i < res.length; i++) {
-                if (`${res[i].id} ${res[i].first_name} ${res[i].last_name}` === answers.chooseEmployeeUpdate) {
-                    chosenDept = res[i];
+                if (`${res[i].id} ${res[i].first_name} ${res[i].last_name}` === answers.deletingEmp) {
+                    chosenEmp = res[i];
                     }
                 }
                 connection.query(
-                    "DELETE FROM department WHERE ?",
+                    "DELETE FROM employee WHERE ?",
                     [
                         {
-                            id: chosenDept.id
+                            id: chosenEmp.id
                         },
                     ],
                 (err) => {
                     if (err) throw err
                     console.log("-----Department deleted successfully!-----");
-                    //manageCompany();
+                    manageCompany();
             })
         });
     })
 }
 
-deleteRole = () => {
+/*deleteRole = () => {
     connection.query("SELECT * FROM employee", function(err, res) {
         if (err) throw err;
         inquirer.prompt([

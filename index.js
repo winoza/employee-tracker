@@ -218,7 +218,6 @@ viewRole = () => {
     })
 }
 
-
 updateRole = () => {
     connection.query("SELECT * FROM employee", function(err, res) {
         if (err) throw err;
@@ -344,7 +343,7 @@ deleteEmployee = () => {
                     };
                     return employees;
                 },
-                message: "Please select the department you would like to delete.",
+                message: "Please select the employee you would like to delete.",
             },
             ]).then(answers => {
                 var chosenEmp;
@@ -362,49 +361,53 @@ deleteEmployee = () => {
                     ],
                 (err) => {
                     if (err) throw err
-                    console.log("-----Department deleted successfully!-----");
+                    console.log("-----Employee deleted successfully!-----");
                     manageCompany();
             })
         });
     })
 }
 
-/*deleteRole = () => {
-    connection.query("SELECT * FROM employee", function(err, res) {
+deleteRole = () => {
+    connection.query("SELECT * FROM employee_role", function(err, res) {
         if (err) throw err;
         inquirer.prompt([
             {
-                name: "deletingDept",
+                name: "deletingEmpRole",
                 type: "list",
                 choices: function() {
-                    var departments = [];
+                    var employeeRoles = [];
                     for (var i = 0; i < res.length; i++) {
-                        departments.push(`${res[i].name}`)
+                        employeeRoles.push(`${res[i].id} ${res[i].title} ${res[i].salary} ${res[i].department_id}`)
                     };
-                    return departments;
+                    return employeeRoles;
                 },
-                message: "Please select the department you would like to delete.",
+                message: "Please select which role you would like to delete.",
             },
             ]).then(answers => {
-                var chosenDept;
+                var chosenEmpRole;
                 for (var i = 0; i < res.length; i++) {
-                if (`${res[i].id} ${res[i].first_name} ${res[i].last_name}` === answers.chooseEmployeeUpdate) {
-                    chosenDept = res[i];
+                if (`${res[i].id} ${res[i].title} ${res[i].salary} ${res[i].department_id}` === answers.deletingEmpRole) {
+                    chosenEmpRole = res[i];
                     }
                 }
                 connection.query(
-                    "DELETE FROM department WHERE ?",
+                    "DELETE FROM employee_role WHERE ?",
                     [
                         {
-                            id: chosenDept.id
+                            id: chosenEmpRole.id
                         },
                     ],
                 (err) => {
                     if (err) throw err
-                    console.log("-----Department deleted successfully!-----");
-                    //manageCompany();
+                    console.log("-----Employee role deleted successfully!-----");
+                    manageCompany();
             })
         });
     })
 }
-*/
+
+quit = () => {
+    console.log('Exit success! Thank you for using Employee Tracker :)')
+    connection.end()
+}

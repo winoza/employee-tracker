@@ -27,17 +27,17 @@ INSERT INTO employee_role (title, salary, department_id) VALUES
     
 
 INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES
-    ('Wiz', 'Khalifa', 1, NULL),
+    ('Wiz', 'Khalifa', 1, 0),
     ('Snoop', 'Dogg', 2, 1),
-    ('Juicy', 'J', 3, NULL),
+    ('Juicy', 'J', 3, 0),
     ('Jay', 'Z', 4, 2),
-    ('Kanye', 'West', 5, NULL),
+    ('Kanye', 'West', 5, 0),
     ('Kendrick', 'Lamar', 6, 3),
-    ('50', 'Cent', 7, NULL),
+    ('50', 'Cent', 7, 0),
     ('Tierra', 'Whack', 8, 4),
-    ('Lauryn', 'Hill', 9, NULL),
-    ('Young', 'Thug', 10, NULL),
-    ('MF', 'Doom', 11, NULL),
-    ('Joey', 'Bada$$', 12, NULL),
-    ('Capital', 'Steez', 13, NULL),
-    ('Lupe', 'Fiasco', 14, NULL);
+    ('Lauryn', 'Hill', 9, 0),
+    ('Young', 'Thug', 10, 0),
+    ('MF', 'Doom', 11, 0),
+    ('Joey', 'Bada$$', 12, 0),
+    ('Capital', 'Steez', 13, 0),
+    ('Lupe', 'Fiasco', 14, 0);

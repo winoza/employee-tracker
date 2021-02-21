@@ -6,9 +6,8 @@ const connection = mysql.createConnection({
   host: "localhost",
   // Your username
   user: "root",
-  // Your password
-  password: "chicken20",
-  database: "employee_management_db"
+  password: "your_password_here",
+  database: "your_database_here"
 });
 
 connection.connect(function(err) {
@@ -27,7 +26,7 @@ manageCompany = () => {
                 "Add department, employee, or role",
                 "View departments, employees, or roles",
                 "Delete departments, employees, or roles",
-                "Update roles",
+                "Update employee's role",
                 "Exit"
             ]
         }]).then(selection => {
@@ -37,7 +36,7 @@ manageCompany = () => {
             view();
         } else if (selection.chooseAction === "Delete departments, employees, or roles") {
             deletes();
-        } else if (selection.chooseAction === "Update roles") {
+        } else if (selection.chooseAction === "Update employee's role") {
             updateRole();
         } else {
             quit();
@@ -116,7 +115,7 @@ addEmployee = () => {
         {
             type: "input",
             name: "addEmployeeManager",
-            message: "Please enter employee's manager id. (If no manager, click 'Enter')"
+            message: "Please enter employee's manager id. (If no manager, enter '0')"
         },
         ]).then(answers => {
             connection.query(
@@ -223,8 +222,8 @@ updateRole = () => {
         if (err) throw err;
         inquirer.prompt([
             {
-                name: "chooseEmployeeUpdate",
                 type: "list",
+                name: "chooseEmployeeUpdate",
                 choices: function() {
                     var employees = [];
                     for (var i = 0; i < res.length; i++) {
@@ -235,9 +234,14 @@ updateRole = () => {
                 message: "Please select the employee you would like update.",
             },
             {
-                name: "updateRoleId",
                 type: "input",
+                name: "updateRoleId",
                 message: "Please select employee's new role (id).",
+            },
+            {
+                name: "updateEmployeeManager",
+                type: "input",
+                message: "Please enter employee's new manager id. (If no manager, enter '0')"
             },
             ]).then(answers => {
                 var chosenEmployee;
@@ -250,7 +254,8 @@ updateRole = () => {
                     "UPDATE employee SET ? WHERE ?",
                     [
                         {
-                            role_id: answers.updateRoleId
+                            role_id: answers.updateRoleId,
+                            manager_id: answers.updateEmployeeManager
                         },
                         {
                             id: chosenEmployee.id
